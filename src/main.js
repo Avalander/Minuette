@@ -11,16 +11,20 @@ const print = pipe(
 	printList,
 )
 
+const updateItems = items => {
+	print(items)
+	return saveData(items)
+}
+
 const commands = require('./commands')
 
 
 const main = ([ command, ...args ]) => 
 	loadData()
-		.then(items => commands[command](args, items))
-		.then(items => {
-			print(items)
-			return items
-		})
-		.then(saveData)
+		.then(items => commands(command) (args, items))
+		.then(items => items
+			? updateItems(items)
+			: () => {}
+		)
 
 module.exports = main
