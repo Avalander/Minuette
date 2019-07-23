@@ -1,8 +1,10 @@
-const { pipeAsync } = require('helpers')
+const { pipeAsync } = require('../helpers')
 
 
-module.exports.loadData = ({ readFile, store_path }) => pipeAsync(
-	() => readFile(store_path, { encoding: 'utf8' }),
+module.exports.loadData = ({ readFile, fileExists, store_path }) => pipeAsync(
+	() => fileExists(store_path)
+		? readFile(store_path, { encoding: 'utf8' })
+		: '[]',
 	JSON.parse,
 )
 

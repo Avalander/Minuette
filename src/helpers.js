@@ -4,10 +4,13 @@ module.exports.pipe = (...fns) => value =>
 		value
 	)
 
+const exists = x => x != null
+const isFunction = x => typeof x === 'function'
+
 module.exports.pipeAsync = (...fns) => value =>
 	fns.reduce(
 		(prev, fn) => prev.then(fn),
-		typeof value.then === 'function'
+		exists(value) && isFunction(value.then)
 			? value
 			: Promise.resolve(value)
 	)

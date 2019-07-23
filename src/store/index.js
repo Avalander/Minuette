@@ -12,9 +12,11 @@ const {
 } = require('./index.factory')
 
 const store_path = path.resolve(os.homedir(), '.minuette', 'data.json')
+fs.mkdirSync(path.resolve(os.homedir(), '.minuette'), { recursive: true })
 
 module.exports.loadData = loadData({
 	readFile,
+	fileExists: fs.existsSync,
 	store_path,
 })
 
