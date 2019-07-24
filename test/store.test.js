@@ -7,29 +7,19 @@ const {
 
 const store_path = '/ponies'
 
-const makeFileExists = (value, check = () => {}) => (...args) => {
-	check(...args)
-	return value
-}
-
-const makeReadFile = (value, check = () => {}) => (...args) => {
-	check(...args)
-	return Promise.resolve(value)
-}
-
 
 test('#loadData reads the file if the store path exists', t => {
 	t.plan(2)
 
 	const func = loadData({
-		fileExists: makeFileExists(
-			true,
-			x => t.equal(x, store_path)
-		),
-		readFile: makeReadFile(
-			'[]',
-			() => t.pass('Calls readFile')
-		),
+		fileExists: path => {
+			t.equal(path, store_path)
+			return true
+		},
+		readFile: () => {
+			t.pass('Calls readFile')
+			return Promise.resolve('[]')
+		},
 		store_path,
 	})
 
@@ -38,8 +28,8 @@ test('#loadData reads the file if the store path exists', t => {
 
 test('#loadData parses file contents', t => {
 	const func = loadData({
-		fileExists: makeFileExists(true),
-		readFile: makeReadFile('[{"status": "done"}]'),
+		fileExists: () => true,
+		readFile: () => Promise.resolve('[{"status": "done"}]'),
 		store_path,
 	})
 
@@ -52,11 +42,10 @@ test('#loadData parses file contents', t => {
 
 test('#loadData does not try to read the file if store path does not exist', t => {
 	const func = loadData({
-		fileExists: makeFileExists(false),
-		readFile: makeReadFile(
-			'[]',
-			() => t.fail('Should not call readFile')
-		),
+		fileExists: () => false,
+		readFile: () => {
+			t.fail('Should not call readFile')
+		},
 		store_path,
 	})
 
@@ -68,8 +57,8 @@ test('#loadData does not try to read the file if store path does not exist', t =
 
 test('#loadData returns empty array if the store file does not exist', t => {
 	const func = loadData({
-		fileExists: makeFileExists(false),
-		readFile: makeReadFile(),
+		fileExists: () => false,
+		readFile: () => {},
 		store_path,
 	})
 
